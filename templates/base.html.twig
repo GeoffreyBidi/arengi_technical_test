@@ -5,13 +5,34 @@
         <title>{% block title %}Welcome!{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
         {% block stylesheets %}
+            <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
         {% endblock %}
 
         {% block javascripts %}
+            <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
     <body>
-        {% block body %}{% endblock %}
+        {% block body %}
+            <div class="px-4 py-5 my-5 text-center">
+                <h1 class="display-5 fw-bold">Test Technique Arengi x Geoffrey Bidi</h1>
+                <div class="col-lg-6 mx-auto">
+                    <p class="lead mb-4">Gestion collection de voitures avec authentification (roles)</p>
+                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                        <a href="{{ path('car_index') }}" class="btn btn-primary btn-lg px-4 gap-3 m-2">Liste des voitures</a>
+                        {% if app.user %}
+                            <div class="mb-3 px-4">
+                                You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+                            </div>
+                        {% else %}
+                            <a href="{{ path('app_login') }}" class="btn btn-outline-secondary btn-lg px-4 m-2">Se connecter</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endblock %}
     </body>
 </html>

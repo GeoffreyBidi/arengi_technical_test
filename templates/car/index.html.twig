@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des voitures{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col">
+            <h1>Liste des voitures</h1>
+        </div>
+        <div class="col text-right m-2">
+            {% if app.user %}
+                <a href="{{ path('car_create') }}" class="btn btn-primary">Ajouter une voiture</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th>Marque</th>
+                <th>Type</th>
+                <th>Nombre de sièges</th>
+                <th>Couleur</th>
+                <th>Auteur</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for car in cars %}
+                <tr>
+                    <td>{{ car.brand }}</td>
+                    <td>{{ car.category.value }}</td>
+                    <td>{{ car.seatNumber }}</td>
+                    <td>{{ car.color }}</td>
+                    <td>{{ car.author.email }}</td>
+                    {% if app.user and app.user.id == car.author.id %}
+                        <td>
+                            <a href="{{ path('car_edit', {'id': car.id}) }}" class="btn btn-outline-warning m-2">Modifier</a>
+                            <form method="post" action="{{ path('car_delete', {'id': car.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette voiture ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ car.id) }}">
+                                <button class="btn btn-danger">Supprimer</button>
+                            </form>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endblock %}

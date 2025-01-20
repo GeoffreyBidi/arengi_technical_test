@@ -1,0 +1,42 @@
+{{ form_start(form, { attr: { class: 'needs-validation' } }) }}
+    <div class="mb-3">
+        {{ form_row(form.brand, { label_attr: { class: 'form-label' }, attr: { class: 'form-control' } }) }}
+    </div>
+    <div class="mb-3">
+        {{ form_row(form.category, { label_attr: { class: 'form-label' }, attr: { class: 'form-control' } }) }}
+    </div>
+    <div class="mb-3">
+        {{ form_row(form.color, { label_attr: { class: 'form-label' }, attr: { class: 'form-control' } }) }}
+    </div>
+    <div class="mb-3" id="maximumAllowedWeight-wrapper" style="display: none;">
+        {{ form_row(form.maximumAllowedWeight, { label_attr: { class: 'form-label' }, attr: { class: 'form-control' } }) }}
+    </div>
+    <div class="mb-3">
+        {{ form_row(form.seatNumber, { label_attr: { class: 'form-label' }, attr: { class: 'form-control' } }) }}
+    </div>
+    <div class="mb-3">
+        {{ form_row(form.author, { label_attr: { class: 'form-label' }, attr: { class: 'form-control' } }) }}
+    </div>
+
+    {{ form_row(form._token) }}
+
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+
+{{ form_end(form) }}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const categoryField    = document.getElementById('car_category');
+        const maxWeightWrapper = document.getElementById('maximumAllowedWeight-wrapper');
+
+        function toggleMaxWeightField() {
+            if (categoryField.value === '3') { // constant('App\\Entity\\CarCategoryEnum::Utility') = 3
+                maxWeightWrapper.style.display = 'block';
+            } else {
+                maxWeightWrapper.style.display = 'none';
+            }
+        }
+        categoryField.addEventListener('change', toggleMaxWeightField);
+        toggleMaxWeightField();
+    });
+</script>
