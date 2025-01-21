@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
+use App\Entity\CarCategoryEnum;
+use App\Repository\CarRepository;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,12 +28,26 @@ class CarController extends AbstractController
     }
 
     #[Route('/', name: 'index', methods: ['GET'])]
-    public function index(): Response
+    public function index(Request $request, CarRepository $carRepository, PaginatorInterface $paginator): Response
     {
-        $cars = $this->entityManager->getRepository(Car::class)->findAll();
+        $filters = [
+            'brand'      => $request->query->get('brand'),
+            'color'      => $request->query->get('color'),
+            'category'   => $request->query->get('category'),
+            'seatNumber' => $request->query->get('seatNumber'),
+        ];
+
+        $query = $carRepository->findByFilters($filters);
+
+        $pagination = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            10
+        );
 
         return $this->render('car/index.html.twig', [
-            'cars' => $cars,
+            'pagination' => $pagination,
+            'categories' => CarCategoryEnum::cases(),
         ]);
     }
 

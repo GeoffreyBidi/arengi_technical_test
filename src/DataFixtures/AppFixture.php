@@ -17,30 +17,32 @@ class AppFixture extends Fixture
     {
         $this->passwordHasher = $passwordHasher;
     }
-    
+
     public function load(ObjectManager $manager): void
     {
-        for ($i = 1; $i <= 10; $i++) {
+        $users = [];
+        for ($i = 1; $i <= 5; $i++) {
             $user = new User();
             $user->setEmail("user{$i}@example.com");
             $user->setRoles(['ROLE_ADMIN']);
             $user->setPassword($this->passwordHasher->hashPassword($user, 'password' . $i));
 
             $manager->persist($user);
+            $users[] = $user;
+        }
 
-            if ($i <= 5) {
-                $car = new Car();
-                $car->setBrand("Brand_{$i}");
-                $car->setSeatNumber($i);
-                $car->setColor("color#{$i}");
-                $car->setMaximumAllowedWeight($i * 1000);
-                $car->setAuthor($user);
+        for ($i = 1; $i <= 50; $i++) {
+            $car = new Car();
+            $car->setBrand("Brand_{$i}")
+                ->setSeatNumber(random_int(1, 6))
+                ->setColor("Color_{$i}")
+                ->setMaximumAllowedWeight(random_int(1, 20) * 100)
+                ->setAuthor($users[array_rand($users)]);
 
-                $categories = CarCategoryEnum::cases();
-                $car->setCategory($categories[($i - 1) % count($categories)]);
+            $categories = CarCategoryEnum::cases();
+            $car->setCategory($categories[($i - 1) % count($categories)]);
 
-                $manager->persist($car);
-            }
+            $manager->persist($car);
         }
 
         $manager->flush();

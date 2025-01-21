@@ -5,10 +5,9 @@ namespace App\Repository;
 use App\Entity\Car;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 
-/**
- * @extends ServiceEntityRepository<Car>
- */
 class CarRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -16,28 +15,31 @@ class CarRepository extends ServiceEntityRepository
         parent::__construct($registry, Car::class);
     }
 
-//    /**
-//     * @return Car[] Returns an array of Car objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('c.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    private const FILTERS = [
+        'brand'      => 'c.brand',
+        'color'      => 'c.color',
+        'category'   => 'c.category',
+        'seatNumber' => 'c.seatNumber',
+    ];
 
-//    public function findOneBySomeField($value): ?Car
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findByFilters(array $criteria): Query
+    {
+        $queryBuilder = $this->createQueryBuilder('c');
+
+        foreach (self::FILTERS as $key => $field) {
+            $this->addFilter($queryBuilder, $criteria, $key, $field);
+        }
+
+        return $queryBuilder->getQuery();
+    }
+
+    private function addFilter(QueryBuilder $queryBuilder, array $criteria, string $key, string $field): void
+    {
+        if (!empty($criteria[$key])) {
+            $queryBuilder
+                ->andWhere("$field = :$key")
+                ->setParameter($key, $criteria[$key])
+            ;
+        }
+    }
 }

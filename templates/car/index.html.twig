@@ -14,37 +14,84 @@
         </div>
     </div>
 
+    <form method="get" action="{{ path('car_index') }}" class="p-4 border rounded bg-light">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="brand" class="form-label font-weight-bold">Marque</label>
+                    <input type="text" name="brand" id="brand" class="form-control" value="{{ app.request.query.get('brand') }}" placeholder="Rechercher une marque">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="category" class="form-label font-weight-bold">Modèle</label>
+                    <select name="category" id="category" class="form-control">
+                        <option value="">Tous</option>
+                        {% for category in categories %}
+                            <option value="{{ category.value }}" {% if app.request.query.get('category') == category.value %}selected{% endif %}>{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row g-3 mt-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="seatNumber" class="form-label font-weight-bold">Nombre de sièges</label>
+                    <input type="number" name="seatNumber" id="seatNumber" class="form-control" value="{{ app.request.query.get('seatNumber') }}" placeholder="Exemple : 5">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="color" class="form-label font-weight-bold">Couleur</label>
+                    <input type="text" name="color" id="color" class="form-control" value="{{ app.request.query.get('color') }}" placeholder="Exemple : Rouge">
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col text-center">
+                <button type="submit" class="btn btn-primary btn-lg">Filtrer</button>
+                <a href="{{ path('car_index') }}" class="btn btn-secondary btn-lg ml-2">Réinitialiser</a>
+            </div>
+        </div>
+    </form>
+
+
     <table class="table">
         <thead class="thead-dark">
-            <tr>
-                <th>Marque</th>
-                <th>Type</th>
-                <th>Nombre de sièges</th>
-                <th>Couleur</th>
-                <th>Auteur</th>
-                <th>Actions</th>
-            </tr>
+        <tr>
+            <th>Marque</th>
+            <th>Type</th>
+            <th>Nombre de sièges</th>
+            <th>Couleur</th>
+            <th>Auteur</th>
+            <th>Actions</th>
+        </tr>
         </thead>
         <tbody>
-            {% for car in cars %}
-                <tr>
-                    <td>{{ car.brand }}</td>
-                    <td>{{ car.category.value }}</td>
-                    <td>{{ car.seatNumber }}</td>
-                    <td>{{ car.color }}</td>
-                    <td>{{ car.author.email }}</td>
-                    {% if app.user and app.user.id == car.author.id %}
-                        <td>
-                            <a href="{{ path('car_edit', {'id': car.id}) }}" class="btn btn-outline-warning m-2">Modifier</a>
-                            <form method="post" action="{{ path('car_delete', {'id': car.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette voiture ?');">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ car.id) }}">
-                                <button class="btn btn-danger">Supprimer</button>
-                            </form>
-                        </td>
-                    {% endif %}
-                </tr>
-            {% endfor %}
-
+        {% for car in pagination %}
+            {% set categoryDisplay = car.category.value == 'utility' ? car.category.value ~ ' (PTRA = ' ~ car.maximumAllowedWeight ~ ' kg)' : car.category.value %}
+            <tr>
+                <td>{{ car.brand }}</td>
+                <td>{{ categoryDisplay }}</td>
+                <td>{{ car.seatNumber }}</td>
+                <td>{{ car.color }}</td>
+                <td>{{ car.author.email }}</td>
+                {% if app.user and app.user.id == car.author.id %}
+                    <td>
+                        <a href="{{ path('car_edit', {'id': car.id}) }}">edit</a>
+                        <form method="post" action="{{ path('car_delete', {'id': car.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette voiture ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ car.id) }}">
+                            <button class="btn btn-danger">Supprimer</button>
+                        </form>
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
         </tbody>
     </table>
+
+    <div class="navigation">
+        {{ knp_pagination_render(pagination) }}
+    </div>
 {% endblock %}
